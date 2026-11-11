@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "business_key": "SKU-1001",
+      "title": "Oak Desk Lamp",
+      "price": 129.0,
+      "category": "lighting",
+      "event_ts": "2026-11-01T10:00:00Z",
+      "source_revision": 3
+    },
+    {
+      "business_key": "SKU-1002",
+      "title": "Walnut Shelf",
+      "price": 249.5,
+      "category": "furniture",
+      "event_ts": "2026-11-01T10:05:00Z",
+      "source_revision": 2
+    },
+    {
+      "business_key": "SKU-1003",
+      "title": "Ceramic Mug Set",
+      "price": 36.0,
+      "category": "kitchen",
+      "event_ts": "2026-11-01T10:10:00Z",
+      "source_revision": 1
+    }
+  ]
+}

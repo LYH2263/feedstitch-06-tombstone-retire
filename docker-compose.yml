@@ -1,0 +1,17 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "10100:10100"
+    volumes:
+      - feedstitch_data:/data
+    environment:
+      DATA_DIR: /data
+  frontend:
+    build: ./frontend
+    ports:
+      - "5100:80"
+    depends_on:
+      - backend
+volumes:
+  feedstitch_data:

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog>
+  <item>
+    <business_key>SKU-3001</business_key>
+    <title>Brass Hook</title>
+    <price>12.5</price>
+    <category>hardware</category>
+    <event_ts>2026-11-02T08:00:00Z</event_ts>
+    <source_revision>1</source_revision>
+  </item>
+  <item>
+    <business_key>SKU-3002</business_key>
+    <title>Pine Crate</title>
+    <price>44.0</price>
+    <category>storage</category>
+    <event_ts>2026-11-02T08:15:00Z</event_ts>
+    <source_revision>2</source_revision>
+  </item>
+</catalog>
