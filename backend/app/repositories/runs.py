@@ -13,8 +13,9 @@ def create_run(
     cur = conn.execute(
         """
         INSERT INTO runs(source_id, mode, status, parsed_count, upserted_count,
-                         conflict_count, skipped_count, report_json, created_at)
-        VALUES (?,?, 'running', 0, 0, 0, 0, '{}', datetime('now'))
+                         conflict_count, skipped_count, retired_count, revived_count,
+                         report_json, created_at)
+        VALUES (?,?, 'running', 0, 0, 0, 0, 0, 0, '{}', datetime('now'))
         """,
         (source_id, mode),
     )
@@ -30,12 +31,14 @@ def finish_run(
     upserted: int,
     conflicts: int,
     skipped: int,
+    retired: int,
+    revived: int,
     report: dict[str, Any],
 ) -> None:
     conn.execute(
         """
         UPDATE runs SET status=?, parsed_count=?, upserted_count=?, conflict_count=?,
-            skipped_count=?, report_json=? WHERE id=?
+            skipped_count=?, retired_count=?, revived_count=?, report_json=? WHERE id=?
         """,
         (
             status,
@@ -43,6 +46,8 @@ def finish_run(
             upserted,
             conflicts,
             skipped,
+            retired,
+            revived,
             json.dumps(report, ensure_ascii=False),
             run_id,
         ),
@@ -54,7 +59,7 @@ def list_runs(conn: sqlite3.Connection) -> list[dict[str, Any]]:
         """
         SELECT r.id, r.source_id, s.name AS source_name, r.mode, r.status,
                r.parsed_count, r.upserted_count, r.conflict_count, r.skipped_count,
-               r.report_json, r.created_at
+               r.retired_count, r.revived_count, r.report_json, r.created_at
         FROM runs r JOIN sources s ON s.id = r.source_id
         ORDER BY r.id DESC
         """
@@ -72,7 +77,7 @@ def get_run(conn: sqlite3.Connection, run_id: int) -> dict[str, Any] | None:
         """
         SELECT r.id, r.source_id, s.name AS source_name, r.mode, r.status,
                r.parsed_count, r.upserted_count, r.conflict_count, r.skipped_count,
-               r.report_json, r.created_at
+               r.retired_count, r.revived_count, r.report_json, r.created_at
         FROM runs r JOIN sources s ON s.id = r.source_id
         WHERE r.id = ?
         """,
@@ -110,6 +115,17 @@ def insert_staging(
             disposition,
         ),
     )
+
+
+def disposition_counts(conn: sqlite3.Connection, run_id: int) -> dict[str, int]:
+    """Count staging rows per disposition for a run. The run report reads the
+    same staging_rows table that powers the Staging list page, so its numbers
+    cannot drift from what is displayed there."""
+    rows = conn.execute(
+        "SELECT disposition, COUNT(*) c FROM staging_rows WHERE run_id = ? GROUP BY disposition",
+        (run_id,),
+    ).fetchall()
+    return {r["disposition"]: int(r["c"]) for r in rows}
 
 
 def list_staging(conn: sqlite3.Connection, run_id: int | None = None) -> list[dict[str, Any]]:

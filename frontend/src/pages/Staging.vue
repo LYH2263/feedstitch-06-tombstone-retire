@@ -3,6 +3,22 @@ import { onMounted, ref } from 'vue'
 import { getJSON } from '../api'
 const rows = ref([])
 const err = ref('')
+
+const DANGER = new Set(['quarantine'])
+const WARN = new Set([
+  'skipped_watermark',
+  'skip_stale',
+  'tombstone_duplicate',
+  'tombstone_unknown',
+  'reject_stale_revived',
+])
+
+function tagClass(disposition) {
+  if (DANGER.has(disposition)) return 'danger'
+  if (WARN.has(disposition)) return 'warn'
+  return 'ok'
+}
+
 onMounted(async () => {
   try {
     rows.value = await getJSON('/api/staging')
@@ -32,10 +48,7 @@ onMounted(async () => {
             <td class="mono">{{ r.event_ts }}</td>
             <td>{{ r.source_revision }}</td>
             <td>
-              <span
-                class="tag"
-                :class="r.disposition === 'quarantine' ? 'danger' : (r.disposition.startsWith('skip') || r.disposition.includes('skip') ? 'warn' : 'ok')"
-              >{{ r.disposition }}</span>
+              <span class="tag" :class="tagClass(r.disposition)">{{ r.disposition }}</span>
             </td>
           </tr>
         </tbody>

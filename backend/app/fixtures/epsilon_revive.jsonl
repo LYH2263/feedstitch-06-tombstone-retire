@@ -1,0 +1,5 @@
+{"business_key":"SKU-1003","title":"Ceramic Mug Set","price":36.0,"category":"kitchen","event_ts":"2026-11-04T08:00:00Z","source_revision":2,"tombstone":true}
+{"business_key":"SKU-1003","title":"Ceramic Mug Set","price":36.0,"category":"kitchen","event_ts":"2026-11-04T09:00:00Z","source_revision":1}
+{"business_key":"SKU-1003","title":"Ceramic Mug Set","price":39.0,"category":"kitchen","event_ts":"2026-11-04T10:00:00Z","source_revision":3}
+{"business_key":"SKU-2001","title":"Linen Throw","price":58.0,"category":"textile","event_ts":"2026-11-04T10:30:00Z","source_revision":2,"status":"retired"}
+{"business_key":"SKU-1003","event_ts":"2026-11-04T11:00:00Z","source_revision":9,"tombstone":true}

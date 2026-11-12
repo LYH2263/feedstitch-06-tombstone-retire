@@ -7,7 +7,8 @@ from typing import Any
 def list_sources(conn: sqlite3.Connection) -> list[dict[str, Any]]:
     rows = conn.execute(
         """
-        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds, enabled, note
+        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds,
+               enabled, note, tombstone_source
         FROM sources ORDER BY id
         """
     ).fetchall()
@@ -17,7 +18,8 @@ def list_sources(conn: sqlite3.Connection) -> list[dict[str, Any]]:
 def get_source(conn: sqlite3.Connection, source_id: int) -> dict[str, Any] | None:
     row = conn.execute(
         """
-        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds, enabled, note
+        SELECT id, name, format, fixture_path, watermark_ts, lookback_seconds,
+               enabled, note, tombstone_source
         FROM sources WHERE id = ?
         """,
         (source_id,),

@@ -40,19 +40,23 @@ watch(sourceId, loadPreview)
     </div>
     <p v-if="err" class="tag danger">{{ err }}</p>
     <div class="panel" v-if="preview">
-      <p>共 <strong>{{ preview.count }}</strong> 条（最多展示 50）</p>
+      <p>
+        共 <strong>{{ preview.count }}</strong> 条（最多展示 50）
+        <span v-if="preview.source?.tombstone_source" class="tag danger" style="margin-left:0.5rem">源级墓碑源：所有行按退役事件处理</span>
+      </p>
       <table>
         <thead>
           <tr>
-            <th>business_key</th><th>title</th><th>price</th><th>category</th><th>event_ts</th><th>rev</th>
+            <th>business_key</th><th>墓碑</th><th>title</th><th>price</th><th>category</th><th>event_ts</th><th>rev</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(it, i) in preview.items" :key="i">
             <td class="mono">{{ it.business_key }}</td>
-            <td>{{ it.title }}</td>
+            <td><span v-if="it.is_tombstone" class="tag danger">tombstone</span><span v-else class="muted">—</span></td>
+            <td>{{ it.title || '—' }}</td>
             <td class="mono">{{ it.price }}</td>
-            <td>{{ it.category }}</td>
+            <td>{{ it.category || '—' }}</td>
             <td class="mono">{{ it.event_ts }}</td>
             <td>{{ it.source_revision }}</td>
           </tr>

@@ -20,7 +20,8 @@ onMounted(async () => {
     <p v-if="err" class="tag danger">{{ err }}</p>
     <div class="tiles" v-if="stats">
       <div class="tile"><div class="hero-num">{{ stats.source_count }}</div><div class="muted">源</div></div>
-      <div class="tile"><div class="hero-num">{{ stats.canonical_count }}</div><div class="muted">Canonical</div></div>
+      <div class="tile"><div class="hero-num">{{ stats.canonical_count }}</div><div class="muted">Canonical 存活</div></div>
+      <div class="tile"><div class="hero-num">{{ stats.canonical_retired_count }}</div><div class="muted">退役（墓碑）</div></div>
       <div class="tile"><div class="hero-num">{{ stats.conflict_count }}</div><div class="muted">冲突</div></div>
       <div class="tile"><div class="hero-num">{{ stats.run_count }}</div><div class="muted">Runs</div></div>
       <div class="tile"><div class="hero-num">{{ stats.staging_count }}</div><div class="muted">Staging</div></div>

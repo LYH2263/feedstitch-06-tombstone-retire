@@ -36,12 +36,17 @@ onMounted(async () => {
 <template>
   <div class="page">
     <h1>运行台</h1>
-    <p class="muted">选源触发增量或全量；报告中的成功 / 冲突 / Canonical 总数需与列表页互证。</p>
+    <p class="muted">
+      选源触发增量或全量；本次报告的写入 / 退役 / 复活 / 冲突 / 跳过必须与 Staging 处置、
+      退役列表及存活主数据条数互相解释（reconciled=true 即恒等式成立）。
+    </p>
     <div class="panel">
       <label>
         源
         <select v-model.number="sourceId">
-          <option v-for="s in sources" :key="s.id" :value="s.id">{{ s.id }}. {{ s.name }}</option>
+          <option v-for="s in sources" :key="s.id" :value="s.id">
+            {{ s.id }}. {{ s.name }}{{ s.tombstone_source ? '（墓碑源）' : '' }}
+          </option>
         </select>
       </label>
       <label style="margin-left:1rem">
@@ -57,23 +62,49 @@ onMounted(async () => {
     </div>
     <p v-if="err" class="tag danger">{{ err }}</p>
     <div class="panel" v-if="last">
-      <h3>最近一次报告</h3>
+      <h3>
+        最近一次报告 · Run #{{ last.id }}
+        <span class="tag" :class="last.status === 'ok' ? 'ok' : 'danger'">{{ last.status }}</span>
+        <span
+          class="tag"
+          :class="last.report?.reconciled ? 'ok' : 'danger'"
+          style="margin-left:0.4rem"
+        >reconciled={{ last.report?.reconciled }}</span>
+      </h3>
       <p>
-        Run #{{ last.id }} ·
-        <span class="tag ok">{{ last.status }}</span> ·
-        parsed {{ last.parsed_count }} /
-        upserted {{ last.upserted_count }} /
-        conflict {{ last.conflict_count }} /
+        parsed {{ last.parsed_count }} =
+        upserted {{ last.upserted_count }} +
+        retired {{ last.retired_count }} +
+        revived {{ last.revived_count }} +
+        conflict {{ last.conflict_count }} +
         skipped {{ last.skipped_count }}
       </p>
-      <p class="mono muted">canonical_count={{ last.report?.canonical_count }} watermark={{ last.report?.watermark_ts }}</p>
+      <p class="mono muted">
+        canonical(存活)={{ last.report?.canonical_alive_count }} ·
+        退役={{ last.report?.canonical_retired_count }} ·
+        合计={{ last.report?.canonical_count }} ·
+        staging 行={{ last.report?.staging_row_count }} ·
+        watermark={{ last.report?.watermark_ts }}
+      </p>
+      <table v-if="last.report?.disposition_counts" style="margin-top:0.5rem">
+        <thead>
+          <tr><th>staging disposition</th><th>行数</th></tr>
+        </thead>
+        <tbody>
+          <tr v-for="(cnt, disp) in last.report.disposition_counts" :key="disp">
+            <td class="mono">{{ disp }}</td>
+            <td>{{ cnt }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="panel">
       <h3>历史 Runs</h3>
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>源</th><th>模式</th><th>状态</th><th>parsed</th><th>upserted</th><th>conflict</th><th>skipped</th><th>时间</th>
+            <th>ID</th><th>源</th><th>模式</th><th>状态</th><th>parsed</th>
+            <th>upserted</th><th>retired</th><th>revived</th><th>conflict</th><th>skipped</th><th>时间</th>
           </tr>
         </thead>
         <tbody>
@@ -84,6 +115,8 @@ onMounted(async () => {
             <td><span class="tag" :class="r.status === 'ok' ? 'ok' : 'danger'">{{ r.status }}</span></td>
             <td>{{ r.parsed_count }}</td>
             <td>{{ r.upserted_count }}</td>
+            <td>{{ r.retired_count }}</td>
+            <td>{{ r.revived_count }}</td>
             <td>{{ r.conflict_count }}</td>
             <td>{{ r.skipped_count }}</td>
             <td class="mono">{{ r.created_at }}</td>
